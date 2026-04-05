@@ -1,0 +1,83 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Required for Wear OS watch face to stay on screen -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!-- Declare Wear OS hardware feature (not required for phone, harmless there) -->
+    <uses-feature
+        android:name="android.hardware.type.watch"
+        android:required="false" />
+
+    <application
+        android:label="watchface_ai"
+        android:name="${applicationName}"
+        android:icon="@mipmap/ic_launcher">
+
+        <!-- ── Phone entry point ── -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:taskAffinity=""
+            android:theme="@style/LaunchTheme"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:hardwareAccelerated="true"
+            android:windowSoftInputMode="adjustResize">
+            <meta-data
+                android:name="io.flutter.embedding.android.NormalTheme"
+                android:resource="@style/NormalTheme" />
+            <!-- Default phone launcher entry -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <!-- Flutter entry point override for phone app -->
+            <meta-data
+                android:name="io.flutter.embedding.android.EntryPoint"
+                android:value="main" />
+        </activity>
+
+        <!-- ── Wear OS watch face entry point ── -->
+        <!--
+             Run with: flutter run -t lib/main_watch.dart -d <wear_os_device_id>
+             The Dart entry point is overridden to "mainWatch" which corresponds
+             to lib/main_watch.dart (Flutter maps the entry point name from the
+             file stem by convention when using -t flag at build time).
+        -->
+        <activity
+            android:name="io.flutter.embedding.android.FlutterActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:taskAffinity=""
+            android:theme="@style/LaunchTheme"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:hardwareAccelerated="true"
+            android:windowSoftInputMode="adjustResize">
+            <!-- Wear OS launcher category -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.HOME" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <meta-data
+                android:name="io.flutter.embedding.android.EntryPoint"
+                android:value="mainWatch" />
+            <!-- Mark as standalone Wear OS app (no paired phone required) -->
+            <meta-data
+                android:name="com.google.android.wearable.standalone"
+                android:value="true" />
+        </activity>
+
+        <!-- Flutter plugin registration meta-data -->
+        <meta-data
+            android:name="flutterEmbedding"
+            android:value="2" />
+    </application>
+
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.PROCESS_TEXT" />
+            <data android:mimeType="text/plain" />
+        </intent>
+    </queries>
+</manifest>
