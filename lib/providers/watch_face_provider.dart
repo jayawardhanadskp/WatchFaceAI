@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/watch_face_config.dart';
 import '../services/gemini_service.dart';
+import '../services/sync_server.dart';
 
 enum AppScreen { home, generating, result }
 
@@ -94,7 +95,7 @@ class WatchFaceNotifier extends StateNotifier<WatchFaceState> {
       if (mounted) {
         state = state.copyWith(
           screen: AppScreen.home,
-          errorMessage: 'Error: ${e.toString()}',
+          errorMessage: e.toString().replaceFirst('Exception: ', ''),
         );
       }
     }
@@ -110,6 +111,8 @@ class WatchFaceNotifier extends StateNotifier<WatchFaceState> {
     if (state.variants.isEmpty) return;
     final config = state.variants[state.selectedVariantIndex];
     await config.save();
+    // Push to the sync server so the watch receives it on its next poll
+    SyncServer.instance.push(config);
     if (mounted) {
       state = state.copyWith(
         currentConfig: config,
