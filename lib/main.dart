@@ -6,13 +6,16 @@ import 'providers/watch_face_provider.dart';
 import 'screens/generating_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/result_screen.dart';
+import 'services/sync_server.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
     statusBarIconBrightness: Brightness.light,
   ));
+  // Start the config sync server so the Wear OS watch can poll it
+  await SyncServer.instance.start();
   runApp(const ProviderScope(child: WatchFacePhoneApp()));
 }
 
