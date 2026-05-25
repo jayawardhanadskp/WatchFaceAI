@@ -1,16 +1,13 @@
 import 'dart:convert';
 
-import 'package:http/http.dart' as http;
+import 'package:google_generative_ai/google_generative_ai.dart';
 
 import '../models/watch_face_config.dart';
 
 // Replace with your Gemini API key from https://aistudio.google.com
-const _apiKey = 'YOUR_GEMINI_API_KEY';
+const _apiKey = 'AIzaSyB-zuqwyZ6slqQ7Id9FWc5aSsC2MFRLmQE';
 
-const _baseUrl =
-    'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
-
-const _systemPrompt =
+const _systemInstruction =
     'You are a watch face designer. Given a user\'s description, return ONLY a valid JSON object with these fields:\n'
     '{\n'
     '  "backgroundColor": hex string,\n'
@@ -23,70 +20,68 @@ const _systemPrompt =
     '  "layout": "minimal" | "info" | "sport",\n'
     '  "borderStyle": "none" | "ring" | "square"\n'
     '}\n'
-    'No explanation, no markdown, just the JSON.';
+    'No explanation, no markdown, no code fences — just the raw JSON object.';
 
 class GeminiService {
-  /// Returns up to 3 design variants for the given [prompt].
-  Future<List<WatchFaceConfig>> generateVariants(String prompt) async {
-    final variantPrompts = [
-      prompt,
-      '$prompt — Variant 2: try a different color palette',
-      '$prompt — Variant 3: try an alternative layout style',
-    ];
+  late final GenerativeModel _model;
 
-    final futures = variantPrompts.map(_generate);
-    final results = await Future.wait(futures);
-    return results.whereType<WatchFaceConfig>().toList();
+  GeminiService() {
+    _model = GenerativeModel(
+      model: 'gemini-2.5-flash',
+      apiKey: _apiKey,
+      systemInstruction: Content.system(_systemInstruction),
+      generationConfig: GenerationConfig(
+        temperature: 0.85,
+        maxOutputTokens: 8192,
+      ),
+    );
   }
 
-  Future<WatchFaceConfig?> _generate(String prompt) async {
-    final url = Uri.parse('$_baseUrl?key=$_apiKey');
+  /// Returns up to 3 design variants. Throws on total failure so the UI
+  /// can display the real error message.
+  Future<List<WatchFaceConfig>> generateVariants(String prompt) async {
+    // Generate the first variant; let any exception propagate to the caller
+    final first = await _generateOrThrow(prompt);
 
-    final requestBody = jsonEncode({
-      'contents': [
-        {
-          'parts': [
-            {'text': '$_systemPrompt\n\nUser description: $prompt'}
-          ]
-        }
-      ],
-      'generationConfig': {
-        'temperature': 0.85,
-        'maxOutputTokens': 512,
-      },
-    });
+    // Generate the remaining 2 variants in parallel; silently drop failures
+    final rest = await Future.wait([
+      _generateSilent('$prompt — Variant 2: different color palette'),
+      _generateSilent('$prompt — Variant 3: alternative layout'),
+    ]);
 
+    return [first, ...rest.whereType<WatchFaceConfig>()];
+  }
+
+  /// Generates one variant and throws on any error (used for the first variant).
+  Future<WatchFaceConfig> _generateOrThrow(String prompt) async {
+    final response = await _model.generateContent([Content.text(prompt)]);
+    final text = response.text;
+    if (text == null || text.isEmpty) {
+      throw Exception('Gemini returned an empty response.');
+    }
+    return _parseConfig(text);
+  }
+
+  /// Generates one variant and returns null on error (used for extras).
+  Future<WatchFaceConfig?> _generateSilent(String prompt) async {
     try {
-      final response = await http
-          .post(
-            url,
-            headers: {'Content-Type': 'application/json'},
-            body: requestBody,
-          )
-          .timeout(const Duration(seconds: 30));
-
-      if (response.statusCode != 200) {
-        throw Exception(
-            'Gemini API returned ${response.statusCode}: ${response.body}');
-      }
-
-      final data = jsonDecode(response.body) as Map<String, dynamic>;
-      final candidates = data['candidates'] as List<dynamic>?;
-      if (candidates == null || candidates.isEmpty) return null;
-
-      final text =
-          candidates[0]['content']['parts'][0]['text'] as String? ?? '';
-
-      // Strip markdown code fences if present
-      final cleaned = text
-          .replaceAll(RegExp(r'```json\s*', caseSensitive: false), '')
-          .replaceAll(RegExp(r'```\s*'), '')
-          .trim();
-
-      final json = jsonDecode(cleaned) as Map<String, dynamic>;
-      return WatchFaceConfig.fromJson(json);
+      return await _generateOrThrow(prompt);
     } catch (_) {
       return null;
     }
+  }
+
+  WatchFaceConfig _parseConfig(String text) {
+    // Strip markdown code fences if the model adds them despite instructions
+    final cleaned = text
+        .replaceAll(RegExp(r'```json\s*', caseSensitive: false), '')
+        .replaceAll(RegExp(r'```\s*'), '')
+        .trim();
+
+    final dynamic decoded = jsonDecode(cleaned);
+    if (decoded is! Map<String, dynamic>) {
+      throw FormatException('Expected a JSON object, got: $cleaned');
+    }
+    return WatchFaceConfig.fromJson(decoded);
   }
 }
