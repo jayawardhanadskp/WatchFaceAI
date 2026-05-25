@@ -61,7 +61,7 @@ Then run the watch app on it:
 ```bash
 flutter run -t lib/main_watch.dart -d <wear_os_device_id>
 ```
-
+ 
 Example:
 ```bash
 flutter run -t lib/main_watch.dart -d emulator-5556
