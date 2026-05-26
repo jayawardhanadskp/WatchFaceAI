@@ -8,7 +8,7 @@ import '../models/watch_face_config.dart';
 const _apiKey = 'AIzaSyB-zuqwyZ6slqQ7Id9FWc5aSsC2MFRLmQE';
 
 const _systemInstruction =
-    'You are a watch face designer. Given a user\'s description, return ONLY a valid JSON object with these fields:\n'
+    'You are an elite premium watch face designer. Given a user\'s description, return ONLY a valid JSON object with these fields:\n'
     '{\n'
     '  "backgroundColor": hex string,\n'
     '  "timeColor": hex string,\n'
@@ -18,8 +18,10 @@ const _systemInstruction =
     '  "showDate": boolean,\n'
     '  "fontStyle": "thin" | "normal" | "bold",\n'
     '  "layout": "minimal" | "info" | "sport",\n'
-    '  "borderStyle": "none" | "ring" | "square"\n'
+    '  "borderStyle": "none" | "ring" | "square",\n'
+    '  "imagePrompt": "A highly detailed, cinematic, and beautiful visual prompt for an AI image generator (e.g. Midjourney) that serves as the watch face background. Describe the subject, lighting, mood, colors, and 8k photorealistic quality in a comma separated prompt. Example: a glowing neon forest at night, deep purple and cyan bioluminescence, 4k, masterpiece"\n'
     '}\n'
+    'The "imagePrompt" is crucial and MUST be extremely creative, visually stunning, and tailored to the vibe of the request.\n'
     'No explanation, no markdown, no code fences — just the raw JSON object.';
 
 class GeminiService {

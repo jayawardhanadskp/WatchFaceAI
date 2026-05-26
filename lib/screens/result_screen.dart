@@ -20,167 +20,179 @@ class ResultScreen extends ConsumerWidget {
     final selectedConfig = state.selectedVariant;
 
     return Scaffold(
-      backgroundColor: _kBg,
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // ── Header ──
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () =>
-                        ref.read(watchFaceProvider.notifier).goHome(),
-                    icon: const Icon(Icons.arrow_back_ios_new,
-                        color: Colors.white70, size: 20),
-                  ),
-                  const Expanded(
-                    child: Text(
-                      'Choose a Design',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: RadialGradient(
+            colors: [
+              Color(0xFF1A1A2E), // Deep space blue/purple
+              _kBg,
+            ],
+            center: Alignment.center,
+            radius: 1.5,
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // ── Header ──
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                child: Row(
+                  children: [
+                    IconButton(
+                      onPressed: () =>
+                          ref.read(watchFaceProvider.notifier).goHome(),
+                      icon: const Icon(Icons.arrow_back_ios_new,
+                          color: Colors.white70, size: 20),
+                    ),
+                    const Expanded(
+                      child: Text(
+                        'Choose a Design',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 44),
-                ],
-              ),
-            )
-                .animate()
-                .fadeIn(duration: 400.ms)
-                .slideY(begin: -0.2, end: 0),
+                    const SizedBox(width: 44),
+                  ],
+                ),
+              )
+                  .animate()
+                  .fadeIn(duration: 400.ms)
+                  .slideY(begin: -0.2, end: 0),
 
-            // ── Large watch preview ──
-            Expanded(
-              child: Center(
-                child: WatchPreviewWidget(
-                  key: ValueKey(selectedIdx),
-                  config: selectedConfig,
-                  size: 220,
+              // ── Large watch preview ──
+              Expanded(
+                child: Center(
+                  child: WatchPreviewWidget(
+                    key: ValueKey(selectedIdx),
+                    config: selectedConfig,
+                    size: 240, // Slightly larger!
+                  )
+                      .animate()
+                      .fadeIn(duration: 500.ms)
+                      .scale(
+                        begin: const Offset(0.8, 0.8),
+                        end: const Offset(1, 1),
+                        duration: 400.ms,
+                        curve: Curves.easeOutBack,
+                      ),
+                ),
+              ),
+
+              // ── Design info chips ──
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  alignment: WrapAlignment.center,
+                  children: [
+                    _InfoChip(label: selectedConfig.layout.toUpperCase(),
+                        icon: Icons.view_quilt_outlined),
+                    _InfoChip(label: selectedConfig.fontStyle.toUpperCase(),
+                        icon: Icons.text_fields),
+                    _InfoChip(label: selectedConfig.borderStyle.toUpperCase(),
+                        icon: Icons.border_style),
+                    if (selectedConfig.showDate)
+                      const _InfoChip(label: 'DATE', icon: Icons.calendar_today_outlined),
+                    if (selectedConfig.showSteps)
+                      const _InfoChip(label: 'STEPS', icon: Icons.directions_walk),
+                    if (selectedConfig.showBattery)
+                      const _InfoChip(label: 'BATTERY', icon: Icons.battery_5_bar),
+                  ],
                 )
                     .animate()
-                    .fadeIn(duration: 500.ms)
-                    .scale(
-                      begin: const Offset(0.8, 0.8),
-                      end: const Offset(1, 1),
-                      duration: 400.ms,
-                      curve: Curves.easeOutBack,
-                    ),
+                    .fadeIn(delay: 200.ms, duration: 400.ms),
               ),
-            ),
 
-            // ── Design info chips ──
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                alignment: WrapAlignment.center,
-                children: [
-                  _InfoChip(label: selectedConfig.layout.toUpperCase(),
-                      icon: Icons.view_quilt_outlined),
-                  _InfoChip(label: selectedConfig.fontStyle.toUpperCase(),
-                      icon: Icons.text_fields),
-                  _InfoChip(label: selectedConfig.borderStyle.toUpperCase(),
-                      icon: Icons.border_style),
-                  if (selectedConfig.showDate)
-                    const _InfoChip(label: 'DATE', icon: Icons.calendar_today_outlined),
-                  if (selectedConfig.showSteps)
-                    const _InfoChip(label: 'STEPS', icon: Icons.directions_walk),
-                  if (selectedConfig.showBattery)
-                    const _InfoChip(label: 'BATTERY', icon: Icons.battery_5_bar),
-                ],
-              )
-                  .animate()
-                  .fadeIn(delay: 200.ms, duration: 400.ms),
-            ),
+              const SizedBox(height: 20),
 
-            const SizedBox(height: 20),
-
-            // ── Variant selector ──
-            if (variants.length > 1) ...[
-              const Padding(
-                padding: EdgeInsets.only(left: 20, bottom: 10),
-                child: Text(
-                  'VARIANTS',
-                  style: TextStyle(
-                    color: Colors.white38,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 1.5,
+              // ── Variant selector ──
+              if (variants.length > 1) ...[
+                const Padding(
+                  padding: EdgeInsets.only(left: 20, bottom: 10),
+                  child: Text(
+                    'VARIANTS',
+                    style: TextStyle(
+                      color: Colors.white38,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 1.5,
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(
-                height: 84,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  itemCount: variants.length,
-                  separatorBuilder: (context, index) => const SizedBox(width: 12),
-                  itemBuilder: (context, i) {
-                    final isSelected = i == selectedIdx;
-                    return GestureDetector(
-                      onTap: () =>
-                          ref.read(watchFaceProvider.notifier).selectVariant(i),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        padding: const EdgeInsets.all(3),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: isSelected
-                                ? _kAccent
-                                : Colors.white.withAlpha(30),
-                            width: isSelected ? 2.5 : 1.5,
+                SizedBox(
+                  height: 84,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    itemCount: variants.length,
+                    separatorBuilder: (context, index) => const SizedBox(width: 12),
+                    itemBuilder: (context, i) {
+                      final isSelected = i == selectedIdx;
+                      return GestureDetector(
+                        onTap: () =>
+                            ref.read(watchFaceProvider.notifier).selectVariant(i),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          padding: const EdgeInsets.all(3),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: isSelected
+                                  ? _kAccent
+                                  : Colors.white.withAlpha(30),
+                              width: isSelected ? 2.5 : 1.5,
+                            ),
+                            boxShadow: isSelected
+                                ? [
+                                    BoxShadow(
+                                      color: _kAccent.withAlpha(100),
+                                      blurRadius: 12,
+                                      spreadRadius: 2,
+                                    )
+                                  ]
+                                : [],
                           ),
-                          boxShadow: isSelected
-                              ? [
-                                  BoxShadow(
-                                    color: _kAccent.withAlpha(100),
-                                    blurRadius: 12,
-                                    spreadRadius: 2,
-                                  )
-                                ]
-                              : [],
+                          child: WatchPreviewWidget(
+                            config: variants[i],
+                            size: 68,
+                            showGlow: false,
+                          ),
                         ),
-                        child: WatchPreviewWidget(
-                          config: variants[i],
-                          size: 68,
-                          showGlow: false,
-                        ),
-                      ),
-                    )
-                        .animate()
-                        .fadeIn(delay: (100 * i).ms, duration: 300.ms)
-                        .scale(
-                          begin: const Offset(0.7, 0.7),
-                          duration: 300.ms,
-                          curve: Curves.easeOutBack,
-                        );
-                  },
+                      )
+                          .animate()
+                          .fadeIn(delay: (100 * i).ms, duration: 300.ms)
+                          .scale(
+                            begin: const Offset(0.7, 0.7),
+                            duration: 300.ms,
+                            curve: Curves.easeOutBack,
+                          );
+                    },
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
-            ],
+                const SizedBox(height: 16),
+              ],
 
-            // ── Apply button ──
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
-              child: _ApplyButton(
-                onTap: () =>
-                    ref.read(watchFaceProvider.notifier).applyToWatch(),
-              )
-                  .animate()
-                  .fadeIn(delay: 300.ms, duration: 400.ms)
-                  .slideY(begin: 0.3, end: 0),
-            ),
-          ],
+              // ── Apply button ──
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
+                child: _ApplyButton(
+                  onTap: () =>
+                      ref.read(watchFaceProvider.notifier).applyToWatch(),
+                )
+                    .animate()
+                    .fadeIn(delay: 300.ms, duration: 400.ms)
+                    .slideY(begin: 0.3, end: 0)
+                    .shimmer(duration: 2000.ms, color: Colors.white.withAlpha(60)),
+              ),
+            ],
+          ),
         ),
       ),
     );

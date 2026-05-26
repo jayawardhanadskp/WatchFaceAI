@@ -13,6 +13,7 @@ class WatchFaceConfig {
   final String fontStyle; // 'thin' | 'normal' | 'bold'
   final String layout; // 'minimal' | 'info' | 'sport'
   final String borderStyle; // 'none' | 'ring' | 'square'
+  final String? imagePrompt; // The descriptive prompt for AI image generation
 
   const WatchFaceConfig({
     required this.backgroundColor,
@@ -24,6 +25,7 @@ class WatchFaceConfig {
     required this.fontStyle,
     required this.layout,
     required this.borderStyle,
+    this.imagePrompt,
   });
 
   factory WatchFaceConfig.defaultConfig() {
@@ -37,6 +39,7 @@ class WatchFaceConfig {
       fontStyle: 'normal',
       layout: 'minimal',
       borderStyle: 'ring',
+      imagePrompt: 'a beautiful futuristic glowing neon city skyline at night, cyberpunk aesthetic, 4k highly detailed, cinematic lighting',
     );
   }
 
@@ -51,6 +54,7 @@ class WatchFaceConfig {
       fontStyle: _validFont(json['fontStyle'] as String?) ?? 'normal',
       layout: _validLayout(json['layout'] as String?) ?? 'minimal',
       borderStyle: _validBorder(json['borderStyle'] as String?) ?? 'none',
+      imagePrompt: json['imagePrompt'] as String?,
     );
   }
 
@@ -64,6 +68,7 @@ class WatchFaceConfig {
         'fontStyle': fontStyle,
         'layout': layout,
         'borderStyle': borderStyle,
+        'imagePrompt': imagePrompt,
       };
 
   WatchFaceConfig copyWith({
@@ -76,6 +81,7 @@ class WatchFaceConfig {
     String? fontStyle,
     String? layout,
     String? borderStyle,
+    String? imagePrompt,
   }) {
     return WatchFaceConfig(
       backgroundColor: backgroundColor ?? this.backgroundColor,
@@ -87,6 +93,7 @@ class WatchFaceConfig {
       fontStyle: fontStyle ?? this.fontStyle,
       layout: layout ?? this.layout,
       borderStyle: borderStyle ?? this.borderStyle,
+      imagePrompt: imagePrompt ?? this.imagePrompt,
     );
   }
 
@@ -160,9 +167,10 @@ class WatchFaceConfig {
           other.showDate == showDate &&
           other.fontStyle == fontStyle &&
           other.layout == layout &&
-          other.borderStyle == borderStyle;
+          other.borderStyle == borderStyle &&
+          other.imagePrompt == imagePrompt;
 
   @override
   int get hashCode => Object.hash(backgroundColor, timeColor, accentColor,
-      showSteps, showBattery, showDate, fontStyle, layout, borderStyle);
+      showSteps, showBattery, showDate, fontStyle, layout, borderStyle, imagePrompt);
 }

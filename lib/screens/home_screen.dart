@@ -59,71 +59,82 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final config = state.currentConfig;
 
     return Scaffold(
-      backgroundColor: _kBg,
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // ── Header ──
-            _Header(),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: RadialGradient(
+            colors: [
+              Color(0xFF1A1A2E), // Deep space blue/purple
+              _kBg,
+            ],
+            center: Alignment.topCenter,
+            radius: 1.5,
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // ── Header ──
+              _Header(),
 
-            // ── Watch preview + style chips ──
-            Expanded(
-              child: Center(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // Floating watch preview
-                      WatchPreviewWidget(config: config, size: 200)
-                          .animate(
-                            onPlay: (c) => c.repeat(reverse: true),
-                          )
-                          .moveY(
-                            begin: -6,
-                            end: 6,
-                            duration: 2400.ms,
-                            curve: Curves.easeInOut,
-                          )
-                          .animate()
-                          .fadeIn(duration: 600.ms)
-                          .scale(begin: const Offset(0.85, 0.85), duration: 500.ms),
+              // ── Watch preview + style chips ──
+              Expanded(
+                child: Center(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Floating watch preview
+                        WatchPreviewWidget(config: config, size: 220)
+                            .animate(
+                              onPlay: (c) => c.repeat(reverse: true),
+                            )
+                            .moveY(
+                              begin: -8,
+                              end: 8,
+                              duration: 2400.ms,
+                              curve: Curves.easeInOut,
+                            )
+                            .animate()
+                            .fadeIn(duration: 600.ms)
+                            .scale(begin: const Offset(0.85, 0.85), duration: 500.ms),
 
-                      const SizedBox(height: 28),
+                        const SizedBox(height: 36),
 
-                      // Style chips
-                      _StyleChips(
-                        selected: _selectedStyle,
-                        onSelected: (i) => setState(() => _selectedStyle = i),
-                      )
-                          .animate()
-                          .fadeIn(delay: 200.ms, duration: 400.ms)
-                          .slideY(begin: 0.2, end: 0),
-                    ],
+                        // Style chips
+                        _StyleChips(
+                          selected: _selectedStyle,
+                          onSelected: (i) => setState(() => _selectedStyle = i),
+                        )
+                            .animate()
+                            .fadeIn(delay: 200.ms, duration: 400.ms)
+                            .slideY(begin: 0.2, end: 0),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
 
-            // ── Error banner ──
-            if (state.errorMessage != null)
-              _ErrorBanner(message: state.errorMessage!)
+              // ── Error banner ──
+              if (state.errorMessage != null)
+                _ErrorBanner(message: state.errorMessage!)
+                    .animate()
+                    .fadeIn(duration: 300.ms)
+                    .slideY(begin: 0.3, end: 0),
+
+              // ── Prompt input ──
+              _PromptInput(
+                controller: _promptController,
+                focusNode: _focusNode,
+                focused: _inputFocused,
+                onSubmit: _submit,
+              )
                   .animate()
-                  .fadeIn(duration: 300.ms)
+                  .fadeIn(delay: 300.ms, duration: 400.ms)
                   .slideY(begin: 0.3, end: 0),
-
-            // ── Prompt input ──
-            _PromptInput(
-              controller: _promptController,
-              focusNode: _focusNode,
-              focused: _inputFocused,
-              onSubmit: _submit,
-            )
-                .animate()
-                .fadeIn(delay: 300.ms, duration: 400.ms)
-                .slideY(begin: 0.3, end: 0),
-          ],
+            ],
+          ),
         ),
       ),
     );

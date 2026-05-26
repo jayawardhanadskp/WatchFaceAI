@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
@@ -43,6 +44,7 @@ class _WatchPreviewWidgetState extends State<WatchPreviewWidget> {
   @override
   Widget build(BuildContext context) {
     final accentColor = widget.config.accentColorValue;
+    final hasImage = widget.config.imagePrompt != null && widget.config.imagePrompt!.isNotEmpty;
 
     return Container(
       width: widget.size,
@@ -60,12 +62,43 @@ class _WatchPreviewWidgetState extends State<WatchPreviewWidget> {
             )
           : null,
       child: ClipOval(
-        child: CustomPaint(
-          size: Size(widget.size, widget.size),
-          painter: WatchFacePainter(
-            config: widget.config,
-            time: _now,
-          ),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            if (hasImage)
+              Image.network(
+                'https://image.pollinations.ai/prompt/${Uri.encodeComponent(widget.config.imagePrompt!)}?width=400&height=400&nologo=true',
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) =>
+                    Container(color: widget.config.backgroundColorValue),
+              )
+            else
+              Container(color: widget.config.backgroundColorValue),
+            
+            if (hasImage)
+              BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: RadialGradient(
+                      colors: [
+                        Colors.black.withAlpha(30),
+                        Colors.black.withAlpha(160),
+                      ],
+                      radius: 0.8,
+                    ),
+                  ),
+                ),
+              ),
+
+            CustomPaint(
+              size: Size(widget.size, widget.size),
+              painter: WatchFacePainter(
+                config: widget.config,
+                time: _now,
+              ),
+            ),
+          ],
         ),
       ),
     );

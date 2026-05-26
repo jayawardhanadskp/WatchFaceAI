@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -107,11 +108,44 @@ class _WatchFaceScreenState extends State<WatchFaceScreen>
 
   @override
   Widget build(BuildContext context) {
+    final hasImage = _config.imagePrompt != null && _config.imagePrompt!.isNotEmpty;
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: SizedBox.expand(
-        child: CustomPaint(
-          painter: WatchFacePainter(config: _config, time: _now),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            if (hasImage)
+              Image.network(
+                'https://image.pollinations.ai/prompt/${Uri.encodeComponent(_config.imagePrompt!)}?width=400&height=400&nologo=true',
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) =>
+                    Container(color: _config.backgroundColorValue),
+              )
+            else
+              Container(color: _config.backgroundColorValue),
+            
+            if (hasImage)
+              BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: RadialGradient(
+                      colors: [
+                        Colors.black.withAlpha(30),
+                        Colors.black.withAlpha(160),
+                      ],
+                      radius: 0.8,
+                    ),
+                  ),
+                ),
+              ),
+
+            CustomPaint(
+              painter: WatchFacePainter(config: _config, time: _now),
+            ),
+          ],
         ),
       ),
     );
