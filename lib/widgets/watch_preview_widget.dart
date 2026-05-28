@@ -1,7 +1,5 @@
-import 'dart:async';
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 
 import '../models/watch_face_config.dart';
 import 'watch_face_painter.dart';
@@ -22,22 +20,24 @@ class WatchPreviewWidget extends StatefulWidget {
   State<WatchPreviewWidget> createState() => _WatchPreviewWidgetState();
 }
 
-class _WatchPreviewWidgetState extends State<WatchPreviewWidget> {
+class _WatchPreviewWidgetState extends State<WatchPreviewWidget>
+    with SingleTickerProviderStateMixin {
   late DateTime _now;
-  late Timer _timer;
+  late Ticker _ticker;
 
   @override
   void initState() {
     super.initState();
     _now = DateTime.now();
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+    _ticker = createTicker((elapsed) {
       if (mounted) setState(() => _now = DateTime.now());
     });
+    _ticker.start();
   }
 
   @override
   void dispose() {
-    _timer.cancel();
+    _ticker.dispose();
     super.dispose();
   }
 

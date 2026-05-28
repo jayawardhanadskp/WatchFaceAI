@@ -109,6 +109,37 @@ class WatchFaceNotifier extends StateNotifier<WatchFaceState> {
     }
   }
 
+  void updateConfig({
+    String? clockType,
+    String? timeFormat,
+    bool? showSteps,
+    bool? showBattery,
+    bool? showDate,
+  }) {
+    if (state.variants.isEmpty) return;
+    
+    final old = state.variants[state.selectedVariantIndex];
+    final newConfig = WatchFaceConfig(
+      backgroundColor: old.backgroundColor,
+      timeColor: old.timeColor,
+      accentColor: old.accentColor,
+      showSteps: showSteps ?? old.showSteps,
+      showBattery: showBattery ?? old.showBattery,
+      showDate: showDate ?? old.showDate,
+      fontStyle: old.fontStyle,
+      layout: old.layout,
+      borderStyle: old.borderStyle,
+      imagePrompt: old.imagePrompt,
+      clockType: clockType ?? old.clockType,
+      timeFormat: timeFormat ?? old.timeFormat,
+    );
+
+    final newVariants = List<WatchFaceConfig>.from(state.variants);
+    newVariants[state.selectedVariantIndex] = newConfig;
+    
+    state = state.copyWith(variants: newVariants);
+  }
+
   Future<void> applyToWatch() async {
     if (state.variants.isEmpty) return;
     final config = state.variants[state.selectedVariantIndex];

@@ -47,10 +47,12 @@ class GeminiService {
     // Generate the first variant; let any exception propagate to the caller
     final first = await _generateOrThrow(prompt);
 
-    // Generate the remaining 2 variants in parallel; silently drop failures
+    // Generate the remaining 4 variants in parallel; silently drop failures
     final rest = await Future.wait([
       _generateSilent('$prompt — Variant 2: different color palette'),
       _generateSilent('$prompt — Variant 3: alternative layout'),
+      _generateSilent('$prompt — Variant 4: highly minimalist'),
+      _generateSilent('$prompt — Variant 5: vibrant and bold'),
     ]);
 
     return [first, ...rest.whereType<WatchFaceConfig>()];

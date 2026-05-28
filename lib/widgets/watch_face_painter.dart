@@ -175,10 +175,9 @@ class WatchFacePainter extends CustomPainter {
     }
 
     // Draw hands
-    final hourAngle = (time.hour % 12 + time.minute / 60) * math.pi / 6 - math.pi / 2;
-    final minuteAngle = (time.minute + time.second / 60) * math.pi / 30 - math.pi / 2;
-    // We don't have seconds strictly updating the UI right now every second if we don't pass it or rely on the timer, but we do update every second in the UI!
-    final secondAngle = time.second * math.pi / 30 - math.pi / 2;
+    final hourAngle = (time.hour % 12 + time.minute / 60.0 + time.second / 3600.0) * math.pi / 6 - math.pi / 2;
+    final minuteAngle = (time.minute + time.second / 60.0 + time.millisecond / 60000.0) * math.pi / 30 - math.pi / 2;
+    final secondAngle = (time.second + time.millisecond / 1000.0) * math.pi / 30 - math.pi / 2;
 
     _drawHand(canvas, center, hourAngle, radius * 0.5, 6, config.timeColorValue, hasImage);
     _drawHand(canvas, center, minuteAngle, radius * 0.75, 4, config.timeColorValue, hasImage);
@@ -406,6 +405,7 @@ class WatchFacePainter extends CustomPainter {
   @override
   bool shouldRepaint(WatchFacePainter old) =>
       old.config != config ||
-      old.time.minute != time.minute ||
-      old.time.hour != time.hour;
+      old.time != time ||
+      old.steps != steps ||
+      old.batteryPercent != batteryPercent;
 }

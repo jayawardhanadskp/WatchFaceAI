@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -183,6 +184,25 @@ class ResultScreen extends ConsumerWidget {
                 const SizedBox(height: 16),
               ],
 
+              // ── Edit button ──
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: _EditButton(
+                  onTap: () {
+                    showModalBottomSheet(
+                      context: context,
+                      backgroundColor: Colors.transparent,
+                      isScrollControlled: true,
+                      builder: (context) => const _EditorSheet(),
+                    );
+                  },
+                )
+                    .animate()
+                    .fadeIn(delay: 250.ms, duration: 400.ms)
+                    .slideY(begin: 0.3, end: 0),
+              ),
+              const SizedBox(height: 12),
+
               // ── Apply button ──
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
@@ -278,6 +298,283 @@ class _ApplyButton extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _EditButton extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _EditButton({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 54,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(27),
+          color: Colors.white.withAlpha(15),
+          border: Border.all(color: Colors.white.withAlpha(30)),
+        ),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.edit_note, color: Colors.white, size: 20),
+            SizedBox(width: 10),
+            Text(
+              'Customize Layout',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.5,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _EditorSheet extends ConsumerWidget {
+  const _EditorSheet();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(watchFaceProvider);
+    if (state.variants.isEmpty) return const SizedBox.shrink();
+    final config = state.variants[state.selectedVariantIndex];
+
+    return Container(
+      decoration: BoxDecoration(
+        color: _kBg.withAlpha(220),
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(28),
+          topRight: Radius.circular(28),
+        ),
+        border: Border.all(color: Colors.white.withAlpha(20)),
+      ),
+      child: ClipRRect(
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(28),
+          topRight: Radius.circular(28),
+        ),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 36),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Drag handle
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: Colors.white24,
+                      borderRadius: BorderRadius.circular(2.5),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                const Text(
+                  'Customize Details',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Fine-tune elements of the selected watch face dynamically.',
+                  style: TextStyle(
+                    color: Colors.white54,
+                    fontSize: 13,
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Clock type selection
+                _buildSegment<String>(
+                  title: 'CLOCK TYPE',
+                  options: ['analog', 'digital'],
+                  labels: ['Analog', 'Digital'],
+                  selected: config.clockType,
+                  onChanged: (val) {
+                    ref.read(watchFaceProvider.notifier).updateConfig(clockType: val);
+                  },
+                ),
+                const SizedBox(height: 20),
+
+                // Time Format selection
+                _buildSegment<String>(
+                  title: 'TIME FORMAT',
+                  options: ['12h', '24h'],
+                  labels: ['12 Hour', '24 Hour'],
+                  selected: config.timeFormat,
+                  onChanged: (val) {
+                    ref.read(watchFaceProvider.notifier).updateConfig(timeFormat: val);
+                  },
+                ),
+                const SizedBox(height: 20),
+
+                // Complications toggles
+                const Text(
+                  'COMPLICATIONS',
+                  style: TextStyle(
+                    color: Colors.white38,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                _ComplicationToggle(
+                  label: 'Show Date',
+                  icon: Icons.calendar_today_outlined,
+                  value: config.showDate,
+                  onChanged: (val) {
+                    ref.read(watchFaceProvider.notifier).updateConfig(showDate: val);
+                  },
+                ),
+                const SizedBox(height: 10),
+                _ComplicationToggle(
+                  label: 'Show Step Counter',
+                  icon: Icons.directions_walk,
+                  value: config.showSteps,
+                  onChanged: (val) {
+                    ref.read(watchFaceProvider.notifier).updateConfig(showSteps: val);
+                  },
+                ),
+                const SizedBox(height: 10),
+                _ComplicationToggle(
+                  label: 'Show Battery Level',
+                  icon: Icons.battery_5_bar,
+                  value: config.showBattery,
+                  onChanged: (val) {
+                    ref.read(watchFaceProvider.notifier).updateConfig(showBattery: val);
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSegment<T>({
+    required String title,
+    required List<T> options,
+    required List<String> labels,
+    required T selected,
+    required ValueChanged<T> onChanged,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            color: Colors.white38,
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 1.5,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Container(
+          height: 44,
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: Colors.white.withAlpha(10),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            children: List.generate(options.length, (idx) {
+              final opt = options[idx];
+              final isSelected = opt == selected;
+              return Expanded(
+                child: GestureDetector(
+                  onTap: () => onChanged(opt),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: isSelected ? _kAccent : Colors.transparent,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      labels[idx],
+                      style: TextStyle(
+                        color: isSelected ? Colors.white : Colors.white70,
+                        fontSize: 13,
+                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ComplicationToggle extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  const _ComplicationToggle({
+    required this.label,
+    required this.icon,
+    required this.value,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 52,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.white.withAlpha(10),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: _kAccent, size: 20),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          Switch(
+            value: value,
+            activeThumbColor: _kAccent,
+            activeTrackColor: _kAccent.withAlpha(80),
+            inactiveThumbColor: Colors.white60,
+            inactiveTrackColor: Colors.white.withAlpha(20),
+            onChanged: onChanged,
+          ),
+        ],
       ),
     );
   }

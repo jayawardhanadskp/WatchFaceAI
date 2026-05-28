@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 
@@ -41,11 +41,11 @@ class WatchFaceScreen extends StatefulWidget {
 }
 
 class _WatchFaceScreenState extends State<WatchFaceScreen>
-    with WidgetsBindingObserver {
+    with WidgetsBindingObserver, SingleTickerProviderStateMixin {
   WatchFaceConfig _config = WatchFaceConfig.defaultConfig();
   DateTime _now = DateTime.now();
 
-  Timer? _clockTimer;
+  Ticker? _ticker;
   Timer? _configTimer;
 
   @override
@@ -54,13 +54,11 @@ class _WatchFaceScreenState extends State<WatchFaceScreen>
     WidgetsBinding.instance.addObserver(this);
     _fetchConfig();
 
-    // Tick the clock every second
-    _clockTimer = Timer.periodic(
-      const Duration(seconds: 1),
-      (_) {
-        if (mounted) setState(() => _now = DateTime.now());
-      },
-    );
+    // Smooth clock updates driven by frame ticks
+    _ticker = createTicker((elapsed) {
+      if (mounted) setState(() => _now = DateTime.now());
+    });
+    _ticker!.start();
 
     // Poll the phone's sync server every 2 seconds
     _configTimer = Timer.periodic(
@@ -101,7 +99,7 @@ class _WatchFaceScreenState extends State<WatchFaceScreen>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _clockTimer?.cancel();
+    _ticker?.dispose();
     _configTimer?.cancel();
     super.dispose();
   }

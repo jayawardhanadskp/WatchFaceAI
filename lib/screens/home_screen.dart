@@ -28,6 +28,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   final _promptController = TextEditingController();
   final _focusNode = FocusNode();
   int _selectedStyle = 0;
+  String _selectedClock = 'Auto';
+  String _selectedFormat = 'Auto';
   bool _inputFocused = false;
 
   @override
@@ -48,7 +50,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void _submit() {
     final raw = _promptController.text.trim();
     if (raw.isEmpty) return;
-    final full = '$raw — style: ${_kStyleHints[_selectedStyle]}';
+    
+    var full = '$raw — style: ${_kStyleHints[_selectedStyle]}';
+    if (_selectedClock != 'Auto') {
+      full += ' — strictly set clockType to ${_selectedClock.toLowerCase()}';
+    }
+    if (_selectedFormat != 'Auto') {
+      full += ' — strictly set timeFormat to ${_selectedFormat.toLowerCase()}';
+    }
+    
     ref.read(watchFaceProvider.notifier).generate(full);
     _focusNode.unfocus();
   }
@@ -109,6 +119,30 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         )
                             .animate()
                             .fadeIn(delay: 200.ms, duration: 400.ms)
+                            .slideY(begin: 0.2, end: 0),
+                            
+                        const SizedBox(height: 16),
+                        
+                        // Clock Type Options
+                        _OptionChips(
+                          options: const ['Auto', 'Digital', 'Analog'],
+                          selected: _selectedClock,
+                          onSelected: (val) => setState(() => _selectedClock = val),
+                        )
+                            .animate()
+                            .fadeIn(delay: 250.ms, duration: 400.ms)
+                            .slideY(begin: 0.2, end: 0),
+                            
+                        const SizedBox(height: 16),
+                        
+                        // Time Format Options
+                        _OptionChips(
+                          options: const ['Auto', '12h', '24h'],
+                          selected: _selectedFormat,
+                          onSelected: (val) => setState(() => _selectedFormat = val),
+                        )
+                            .animate()
+                            .fadeIn(delay: 300.ms, duration: 400.ms)
                             .slideY(begin: 0.2, end: 0),
                       ],
                     ),
@@ -381,6 +415,55 @@ class _ErrorBanner extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _OptionChips extends StatelessWidget {
+  final List<String> options;
+  final String selected;
+  final ValueChanged<String> onSelected;
+
+  const _OptionChips({required this.options, required this.selected, required this.onSelected});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 36,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        itemCount: options.length,
+        separatorBuilder: (context, index) => const SizedBox(width: 8),
+        itemBuilder: (context, i) {
+          final isSelected = options[i] == selected;
+          return GestureDetector(
+            onTap: () => onSelected(options[i]),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: isSelected ? _kAccent.withAlpha(40) : _kSurface,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(
+                  color: isSelected ? _kAccent : Colors.white.withAlpha(20),
+                  width: isSelected ? 1.5 : 1,
+                ),
+              ),
+              child: Center(
+                child: Text(
+                  options[i],
+                  style: TextStyle(
+                    color: isSelected ? _kAccent : Colors.white60,
+                    fontSize: 12,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
