@@ -57,6 +57,8 @@ class WatchFaceNotifier extends StateNotifier<WatchFaceState> {
           fontStyle: 'normal',
           layout: 'minimal',
           borderStyle: 'ring',
+          clockType: 'digital',
+          timeFormat: '24h',
         ))) {
     _loadSaved();
   }

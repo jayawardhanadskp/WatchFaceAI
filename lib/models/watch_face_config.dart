@@ -14,6 +14,8 @@ class WatchFaceConfig {
   final String layout; // 'minimal' | 'info' | 'sport'
   final String borderStyle; // 'none' | 'ring' | 'square'
   final String? imagePrompt; // The descriptive prompt for AI image generation
+  final String clockType; // 'digital' | 'analog'
+  final String timeFormat; // '12h' | '24h'
 
   const WatchFaceConfig({
     required this.backgroundColor,
@@ -26,6 +28,8 @@ class WatchFaceConfig {
     required this.layout,
     required this.borderStyle,
     this.imagePrompt,
+    required this.clockType,
+    required this.timeFormat,
   });
 
   factory WatchFaceConfig.defaultConfig() {
@@ -40,6 +44,8 @@ class WatchFaceConfig {
       layout: 'minimal',
       borderStyle: 'ring',
       imagePrompt: 'a beautiful futuristic glowing neon city skyline at night, cyberpunk aesthetic, 4k highly detailed, cinematic lighting',
+      clockType: 'digital',
+      timeFormat: '24h',
     );
   }
 
@@ -55,6 +61,8 @@ class WatchFaceConfig {
       layout: _validLayout(json['layout'] as String?) ?? 'minimal',
       borderStyle: _validBorder(json['borderStyle'] as String?) ?? 'none',
       imagePrompt: json['imagePrompt'] as String?,
+      clockType: _validClockType(json['clockType'] as String?) ?? 'digital',
+      timeFormat: _validTimeFormat(json['timeFormat'] as String?) ?? '24h',
     );
   }
 
@@ -69,6 +77,8 @@ class WatchFaceConfig {
         'layout': layout,
         'borderStyle': borderStyle,
         'imagePrompt': imagePrompt,
+        'clockType': clockType,
+        'timeFormat': timeFormat,
       };
 
   WatchFaceConfig copyWith({
@@ -82,6 +92,8 @@ class WatchFaceConfig {
     String? layout,
     String? borderStyle,
     String? imagePrompt,
+    String? clockType,
+    String? timeFormat,
   }) {
     return WatchFaceConfig(
       backgroundColor: backgroundColor ?? this.backgroundColor,
@@ -94,6 +106,8 @@ class WatchFaceConfig {
       layout: layout ?? this.layout,
       borderStyle: borderStyle ?? this.borderStyle,
       imagePrompt: imagePrompt ?? this.imagePrompt,
+      clockType: clockType ?? this.clockType,
+      timeFormat: timeFormat ?? this.timeFormat,
     );
   }
 
@@ -136,6 +150,12 @@ class WatchFaceConfig {
   static String? _validBorder(String? v) =>
       (v == 'none' || v == 'ring' || v == 'square') ? v : null;
 
+  static String? _validClockType(String? v) =>
+      (v == 'digital' || v == 'analog') ? v : null;
+
+  static String? _validTimeFormat(String? v) =>
+      (v == '12h' || v == '24h') ? v : null;
+
   static const String _prefsKey = 'watchface_config';
 
   static Future<WatchFaceConfig> load() async {
@@ -168,9 +188,22 @@ class WatchFaceConfig {
           other.fontStyle == fontStyle &&
           other.layout == layout &&
           other.borderStyle == borderStyle &&
-          other.imagePrompt == imagePrompt;
+          other.imagePrompt == imagePrompt &&
+          other.clockType == clockType &&
+          other.timeFormat == timeFormat;
 
   @override
-  int get hashCode => Object.hash(backgroundColor, timeColor, accentColor,
-      showSteps, showBattery, showDate, fontStyle, layout, borderStyle, imagePrompt);
+  int get hashCode => Object.hash(
+      backgroundColor,
+      timeColor,
+      accentColor,
+      showSteps,
+      showBattery,
+      showDate,
+      fontStyle,
+      layout,
+      borderStyle,
+      imagePrompt,
+      clockType,
+      timeFormat);
 }

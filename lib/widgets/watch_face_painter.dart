@@ -100,9 +100,31 @@ class WatchFacePainter extends CustomPainter {
   }
 
   void _drawTime(Canvas canvas, Offset center, double radius, bool hasImage) {
-    final h = time.hour.toString().padLeft(2, '0');
+    if (config.clockType == 'analog') {
+      _drawAnalogClock(canvas, center, radius, hasImage);
+    } else {
+      _drawDigitalClock(canvas, center, radius, hasImage);
+    }
+  }
+
+  void _drawDigitalClock(Canvas canvas, Offset center, double radius, bool hasImage) {
+    int hour = time.hour;
+    final is12h = config.timeFormat == '12h';
+    String amPm = '';
+    
+    if (is12h) {
+      if (hour >= 12) {
+        amPm = ' PM';
+        if (hour > 12) hour -= 12;
+      } else {
+        amPm = ' AM';
+        if (hour == 0) hour = 12;
+      }
+    }
+
+    final h = hour.toString().padLeft(2, '0');
     final m = time.minute.toString().padLeft(2, '0');
-    final timeStr = '$h:$m';
+    final timeStr = '$h:$m$amPm';
 
     final weight = switch (config.fontStyle) {
       'thin' => FontWeight.w200,
@@ -110,7 +132,7 @@ class WatchFacePainter extends CustomPainter {
       _ => FontWeight.w500,
     };
 
-    final fontSize = radius * 0.42; // slightly larger for premium feel
+    final fontSize = is12h ? radius * 0.35 : radius * 0.42; // slightly smaller if am/pm
     final tp = _buildTextPainter(
       timeStr,
       fontSize: fontSize,
@@ -124,6 +146,76 @@ class WatchFacePainter extends CustomPainter {
     tp.paint(
       canvas,
       center - Offset(tp.width / 2, tp.height / 2) + Offset(0, yOffset),
+    );
+  }
+
+  void _drawAnalogClock(Canvas canvas, Offset center, double radius, bool hasImage) {
+    // Draw hour markers
+    final markerPaint = Paint()
+      ..color = config.timeColorValue.withAlpha(hasImage ? 255 : 150)
+      ..strokeWidth = 2
+      ..strokeCap = StrokeCap.round;
+      
+    if (hasImage) {
+      markerPaint.maskFilter = const MaskFilter.blur(BlurStyle.solid, 2);
+    }
+
+    for (int i = 0; i < 12; i++) {
+      final angle = i * math.pi / 6;
+      final isMajor = i % 3 == 0;
+      final innerR = isMajor ? radius * 0.75 : radius * 0.85;
+      final outerR = radius * 0.92;
+      markerPaint.strokeWidth = isMajor ? 3 : 1.5;
+      
+      canvas.drawLine(
+        center + Offset(math.cos(angle) * innerR, math.sin(angle) * innerR),
+        center + Offset(math.cos(angle) * outerR, math.sin(angle) * outerR),
+        markerPaint,
+      );
+    }
+
+    // Draw hands
+    final hourAngle = (time.hour % 12 + time.minute / 60) * math.pi / 6 - math.pi / 2;
+    final minuteAngle = (time.minute + time.second / 60) * math.pi / 30 - math.pi / 2;
+    // We don't have seconds strictly updating the UI right now every second if we don't pass it or rely on the timer, but we do update every second in the UI!
+    final secondAngle = time.second * math.pi / 30 - math.pi / 2;
+
+    _drawHand(canvas, center, hourAngle, radius * 0.5, 6, config.timeColorValue, hasImage);
+    _drawHand(canvas, center, minuteAngle, radius * 0.75, 4, config.timeColorValue, hasImage);
+    _drawHand(canvas, center, secondAngle, radius * 0.8, 2, config.accentColorValue, hasImage);
+    
+    // Center dot
+    canvas.drawCircle(
+      center,
+      radius * 0.05,
+      Paint()..color = config.accentColorValue,
+    );
+  }
+
+  void _drawHand(Canvas canvas, Offset center, double angle, double length, double width, Color color, bool hasImage) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = width
+      ..strokeCap = StrokeCap.round;
+      
+    if (hasImage) {
+      paint.maskFilter = const MaskFilter.blur(BlurStyle.solid, 2);
+      // add shadow
+      canvas.drawLine(
+        center,
+        center + Offset(math.cos(angle) * length, math.sin(angle) * length) + const Offset(2, 2),
+        Paint()
+          ..color = Colors.black.withAlpha(150)
+          ..strokeWidth = width
+          ..strokeCap = StrokeCap.round
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4),
+      );
+    }
+
+    canvas.drawLine(
+      center,
+      center + Offset(math.cos(angle) * length, math.sin(angle) * length),
+      paint,
     );
   }
 

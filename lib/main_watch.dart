@@ -118,7 +118,7 @@ class _WatchFaceScreenState extends State<WatchFaceScreen>
           children: [
             if (hasImage)
               Image.network(
-                'https://image.pollinations.ai/prompt/${Uri.encodeComponent(_config.imagePrompt!)}?width=400&height=400&nologo=true',
+                'https://image.pollinations.ai/prompt/${Uri.encodeComponent(_config.imagePrompt!)}?width=800&height=800&nologo=true',
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) =>
                     Container(color: _config.backgroundColorValue),
@@ -127,17 +127,14 @@ class _WatchFaceScreenState extends State<WatchFaceScreen>
               Container(color: _config.backgroundColorValue),
             
             if (hasImage)
-              BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: RadialGradient(
-                      colors: [
-                        Colors.black.withAlpha(30),
-                        Colors.black.withAlpha(160),
-                      ],
-                      radius: 0.8,
-                    ),
+              Container(
+                decoration: BoxDecoration(
+                  gradient: RadialGradient(
+                    colors: [
+                      Colors.black.withAlpha(10), // Clear center
+                      Colors.black.withAlpha(140), // Dark edge
+                    ],
+                    radius: 0.85,
                   ),
                 ),
               ),

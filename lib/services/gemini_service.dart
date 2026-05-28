@@ -5,7 +5,7 @@ import 'package:google_generative_ai/google_generative_ai.dart';
 import '../models/watch_face_config.dart';
 
 // Replace with your Gemini API key from https://aistudio.google.com
-const _apiKey = 'AIzaSyB-zuqwyZ6slqQ7Id9FWc5aSsC2MFRLmQE';
+const _apiKey = 'AIzaSyBz9lsJ6oGAHIdGu1kjZcYuokLX3XgvAhA';
 
 const _systemInstruction =
     'You are an elite premium watch face designer. Given a user\'s description, return ONLY a valid JSON object with these fields:\n'
@@ -19,9 +19,11 @@ const _systemInstruction =
     '  "fontStyle": "thin" | "normal" | "bold",\n'
     '  "layout": "minimal" | "info" | "sport",\n'
     '  "borderStyle": "none" | "ring" | "square",\n'
-    '  "imagePrompt": "A highly detailed, cinematic, and beautiful visual prompt for an AI image generator (e.g. Midjourney) that serves as the watch face background. Describe the subject, lighting, mood, colors, and 8k photorealistic quality in a comma separated prompt. Example: a glowing neon forest at night, deep purple and cyan bioluminescence, 4k, masterpiece"\n'
+    '  "clockType": "digital" | "analog",\n'
+    '  "timeFormat": "12h" | "24h",\n'
+    '  "imagePrompt": "A highly detailed, beautiful visual prompt for an AI image generator (e.g. Midjourney) that serves as the watch face background. Describe the subject, lighting, mood, colors. MUST EXPLICITLY specify \'No text, no clocks, no numbers, perfectly centered background\' in the prompt to prevent the AI from generating fake clocks."\n'
     '}\n'
-    'The "imagePrompt" is crucial and MUST be extremely creative, visually stunning, and tailored to the vibe of the request.\n'
+    'The "imagePrompt" is crucial and MUST be extremely creative and stunning. Do not include text or clocks in the generated image.\n'
     'No explanation, no markdown, no code fences — just the raw JSON object.';
 
 class GeminiService {

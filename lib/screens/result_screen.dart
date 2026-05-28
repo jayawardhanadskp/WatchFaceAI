@@ -93,17 +93,21 @@ class ResultScreen extends ConsumerWidget {
                   alignment: WrapAlignment.center,
                   children: [
                     _InfoChip(label: selectedConfig.layout.toUpperCase(),
-                        icon: Icons.view_quilt_outlined),
-                    _InfoChip(label: selectedConfig.fontStyle.toUpperCase(),
-                        icon: Icons.text_fields),
-                    _InfoChip(label: selectedConfig.borderStyle.toUpperCase(),
-                        icon: Icons.border_style),
-                    if (selectedConfig.showDate)
-                      const _InfoChip(label: 'DATE', icon: Icons.calendar_today_outlined),
-                    if (selectedConfig.showSteps)
-                      const _InfoChip(label: 'STEPS', icon: Icons.directions_walk),
-                    if (selectedConfig.showBattery)
-                      const _InfoChip(label: 'BATTERY', icon: Icons.battery_5_bar),
+                      icon: Icons.view_quilt_outlined),
+                  _InfoChip(label: selectedConfig.fontStyle.toUpperCase(),
+                      icon: Icons.text_fields),
+                  _InfoChip(label: selectedConfig.borderStyle.toUpperCase(),
+                      icon: Icons.border_style),
+                  _InfoChip(label: selectedConfig.clockType.toUpperCase(),
+                      icon: Icons.watch_later_outlined),
+                  _InfoChip(label: selectedConfig.timeFormat,
+                      icon: Icons.schedule),
+                  if (selectedConfig.showDate)
+                    const _InfoChip(label: 'DATE', icon: Icons.calendar_today_outlined),
+                  if (selectedConfig.showSteps)
+                    const _InfoChip(label: 'STEPS', icon: Icons.directions_walk),
+                  if (selectedConfig.showBattery)
+                    const _InfoChip(label: 'BATTERY', icon: Icons.battery_5_bar),
                   ],
                 )
                     .animate()
