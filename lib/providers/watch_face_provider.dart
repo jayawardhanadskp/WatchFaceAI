@@ -46,20 +46,23 @@ class WatchFaceNotifier extends StateNotifier<WatchFaceState> {
   final GeminiService _gemini;
 
   WatchFaceNotifier(this._gemini)
-      : super(const WatchFaceState(
-            currentConfig: WatchFaceConfig(
-          backgroundColor: '#0A0A0F',
-          timeColor: '#FFFFFF',
-          accentColor: '#6C63FF',
-          showSteps: true,
-          showBattery: true,
-          showDate: true,
-          fontStyle: 'normal',
-          layout: 'minimal',
-          borderStyle: 'ring',
-          clockType: 'digital',
-          timeFormat: '24h',
-        ))) {
+    : super(
+        const WatchFaceState(
+          currentConfig: WatchFaceConfig(
+            backgroundColor: '#0A0A0F',
+            timeColor: '#FFFFFF',
+            accentColor: '#6C63FF',
+            showSteps: true,
+            showBattery: true,
+            showDate: true,
+            fontStyle: 'normal',
+            layout: 'minimal',
+            borderStyle: 'ring',
+            clockType: 'digital',
+            timeFormat: '24h',
+          ),
+        ),
+      ) {
     _loadSaved();
   }
 
@@ -69,10 +72,7 @@ class WatchFaceNotifier extends StateNotifier<WatchFaceState> {
   }
 
   Future<void> generate(String prompt) async {
-    state = state.copyWith(
-      screen: AppScreen.generating,
-      clearError: true,
-    );
+    state = state.copyWith(screen: AppScreen.generating, clearError: true);
 
     try {
       final variants = await _gemini.generateVariants(prompt);
@@ -81,8 +81,7 @@ class WatchFaceNotifier extends StateNotifier<WatchFaceState> {
       if (variants.isEmpty) {
         state = state.copyWith(
           screen: AppScreen.home,
-          errorMessage:
-              'Could not generate design. Check your Gemini API key.',
+          errorMessage: 'Could not generate design. Check your Gemini API key.',
         );
         return;
       }
@@ -117,7 +116,7 @@ class WatchFaceNotifier extends StateNotifier<WatchFaceState> {
     bool? showDate,
   }) {
     if (state.variants.isEmpty) return;
-    
+
     final old = state.variants[state.selectedVariantIndex];
     final newConfig = WatchFaceConfig(
       backgroundColor: old.backgroundColor,
@@ -136,7 +135,7 @@ class WatchFaceNotifier extends StateNotifier<WatchFaceState> {
 
     final newVariants = List<WatchFaceConfig>.from(state.variants);
     newVariants[state.selectedVariantIndex] = newConfig;
-    
+
     state = state.copyWith(variants: newVariants);
   }
 
@@ -164,5 +163,5 @@ final _geminiServiceProvider = Provider<GeminiService>((_) => GeminiService());
 
 final watchFaceProvider =
     StateNotifierProvider<WatchFaceNotifier, WatchFaceState>(
-  (ref) => WatchFaceNotifier(ref.read(_geminiServiceProvider)),
-);
+      (ref) => WatchFaceNotifier(ref.read(_geminiServiceProvider)),
+    );

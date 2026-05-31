@@ -43,7 +43,8 @@ class WatchFaceConfig {
       fontStyle: 'normal',
       layout: 'minimal',
       borderStyle: 'ring',
-      imagePrompt: 'a beautiful futuristic glowing neon city skyline at night, cyberpunk aesthetic, 4k highly detailed, cinematic lighting',
+      imagePrompt:
+          'a beautiful futuristic glowing neon city skyline at night, cyberpunk aesthetic, 4k highly detailed, cinematic lighting',
       clockType: 'digital',
       timeFormat: '24h',
     );
@@ -51,7 +52,8 @@ class WatchFaceConfig {
 
   factory WatchFaceConfig.fromJson(Map<String, dynamic> json) {
     return WatchFaceConfig(
-      backgroundColor: _sanitizeHex(json['backgroundColor'] as String?) ?? '#0A0A0F',
+      backgroundColor:
+          _sanitizeHex(json['backgroundColor'] as String?) ?? '#0A0A0F',
       timeColor: _sanitizeHex(json['timeColor'] as String?) ?? '#FFFFFF',
       accentColor: _sanitizeHex(json['accentColor'] as String?) ?? '#6C63FF',
       showSteps: json['showSteps'] as bool? ?? true,
@@ -67,19 +69,19 @@ class WatchFaceConfig {
   }
 
   Map<String, dynamic> toJson() => {
-        'backgroundColor': backgroundColor,
-        'timeColor': timeColor,
-        'accentColor': accentColor,
-        'showSteps': showSteps,
-        'showBattery': showBattery,
-        'showDate': showDate,
-        'fontStyle': fontStyle,
-        'layout': layout,
-        'borderStyle': borderStyle,
-        'imagePrompt': imagePrompt,
-        'clockType': clockType,
-        'timeFormat': timeFormat,
-      };
+    'backgroundColor': backgroundColor,
+    'timeColor': timeColor,
+    'accentColor': accentColor,
+    'showSteps': showSteps,
+    'showBattery': showBattery,
+    'showDate': showDate,
+    'fontStyle': fontStyle,
+    'layout': layout,
+    'borderStyle': borderStyle,
+    'imagePrompt': imagePrompt,
+    'clockType': clockType,
+    'timeFormat': timeFormat,
+  };
 
   WatchFaceConfig copyWith({
     String? backgroundColor,
@@ -113,7 +115,8 @@ class WatchFaceConfig {
 
   Color get backgroundColorValue => _parseColor(backgroundColor, Colors.black);
   Color get timeColorValue => _parseColor(timeColor, Colors.white);
-  Color get accentColorValue => _parseColor(accentColor, const Color(0xFF6C63FF));
+  Color get accentColorValue =>
+      _parseColor(accentColor, const Color(0xFF6C63FF));
 
   static Color _parseColor(String? hex, Color fallback) {
     if (hex == null) return fallback;
@@ -164,7 +167,8 @@ class WatchFaceConfig {
     if (jsonStr == null) return WatchFaceConfig.defaultConfig();
     try {
       return WatchFaceConfig.fromJson(
-          jsonDecode(jsonStr) as Map<String, dynamic>);
+        jsonDecode(jsonStr) as Map<String, dynamic>,
+      );
     } catch (_) {
       return WatchFaceConfig.defaultConfig();
     }
@@ -194,16 +198,17 @@ class WatchFaceConfig {
 
   @override
   int get hashCode => Object.hash(
-      backgroundColor,
-      timeColor,
-      accentColor,
-      showSteps,
-      showBattery,
-      showDate,
-      fontStyle,
-      layout,
-      borderStyle,
-      imagePrompt,
-      clockType,
-      timeFormat);
+    backgroundColor,
+    timeColor,
+    accentColor,
+    showSteps,
+    showBattery,
+    showDate,
+    fontStyle,
+    layout,
+    borderStyle,
+    imagePrompt,
+    clockType,
+    timeFormat,
+  );
 }
