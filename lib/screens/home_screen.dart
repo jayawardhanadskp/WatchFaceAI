@@ -210,15 +210,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   letterSpacing: 0.3,
                 ),
               ),
-              Text(
-                'POWERED BY GEMINI',
-                style: TextStyle(
-                  color: AppTheme.textSecondary,
-                  fontSize: 9,
-                  fontWeight: FontWeight.w500,
-                  letterSpacing: 0.8,
-                ),
-              ),
+              // Text(
+              //   'POWERED BY GEMINI',
+              //   style: TextStyle(
+              //     color: AppTheme.textSecondary,
+              //     fontSize: 9,
+              //     fontWeight: FontWeight.w500,
+              //     letterSpacing: 0.8,
+              //   ),
+              // ),
             ],
           ),
           const Spacer(),
