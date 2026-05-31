@@ -16,6 +16,8 @@ dependencies:
   google_generative_ai: ^0.4.0
   http: ^1.0.0
   shared_preferences: ^2.0.0
+  image_picker: ^1.0.0
+  palette_generator: ^0.3.3
 
 dev_dependencies:
   flutter_test:
