@@ -4,11 +4,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/watch_face_provider.dart';
+import '../widgets/modern_design.dart';
 import '../widgets/watch_preview_widget.dart';
-
-const _kAccent = Color(0xFF6C63FF);
-const _kBg = Color(0xFF0A0A0F);
-const _kSurface = Color(0xFF12121A);
 
 class ResultScreen extends ConsumerWidget {
   const ResultScreen({super.key});
@@ -24,10 +21,7 @@ class ResultScreen extends ConsumerWidget {
       body: Container(
         decoration: const BoxDecoration(
           gradient: RadialGradient(
-            colors: [
-              Color(0xFF1A1A2E), // Deep space blue/purple
-              _kBg,
-            ],
+            colors: [Color(0xFF1A1A2E), AppTheme.bgDark],
             center: Alignment.center,
             radius: 1.5,
           ),
@@ -44,15 +38,18 @@ class ResultScreen extends ConsumerWidget {
                     IconButton(
                       onPressed: () =>
                           ref.read(watchFaceProvider.notifier).goHome(),
-                      icon: const Icon(Icons.arrow_back_ios_new,
-                          color: Colors.white70, size: 20),
+                      icon: const Icon(
+                        Icons.arrow_back_ios_new,
+                        color: AppTheme.textSecondary,
+                        size: 20,
+                      ),
                     ),
                     const Expanded(
                       child: Text(
                         'Choose a Design',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: Colors.white,
+                          color: AppTheme.textPrimary,
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
                         ),
@@ -61,27 +58,25 @@ class ResultScreen extends ConsumerWidget {
                     const SizedBox(width: 44),
                   ],
                 ),
-              )
-                  .animate()
-                  .fadeIn(duration: 400.ms)
-                  .slideY(begin: -0.2, end: 0),
+              ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.2, end: 0),
 
               // ── Large watch preview ──
               Expanded(
                 child: Center(
-                  child: WatchPreviewWidget(
-                    key: ValueKey(selectedIdx),
-                    config: selectedConfig,
-                    size: 240, // Slightly larger!
-                  )
-                      .animate()
-                      .fadeIn(duration: 500.ms)
-                      .scale(
-                        begin: const Offset(0.8, 0.8),
-                        end: const Offset(1, 1),
-                        duration: 400.ms,
-                        curve: Curves.easeOutBack,
-                      ),
+                  child:
+                      WatchPreviewWidget(
+                            key: ValueKey(selectedIdx),
+                            config: selectedConfig,
+                            size: 240, // Slightly larger!
+                          )
+                          .animate()
+                          .fadeIn(duration: 500.ms)
+                          .scale(
+                            begin: const Offset(0.8, 0.8),
+                            end: const Offset(1, 1),
+                            duration: 400.ms,
+                            curve: Curves.easeOutBack,
+                          ),
                 ),
               ),
 
@@ -93,26 +88,43 @@ class ResultScreen extends ConsumerWidget {
                   runSpacing: 8,
                   alignment: WrapAlignment.center,
                   children: [
-                    _InfoChip(label: selectedConfig.layout.toUpperCase(),
-                      icon: Icons.view_quilt_outlined),
-                  _InfoChip(label: selectedConfig.fontStyle.toUpperCase(),
-                      icon: Icons.text_fields),
-                  _InfoChip(label: selectedConfig.borderStyle.toUpperCase(),
-                      icon: Icons.border_style),
-                  _InfoChip(label: selectedConfig.clockType.toUpperCase(),
-                      icon: Icons.watch_later_outlined),
-                  _InfoChip(label: selectedConfig.timeFormat,
-                      icon: Icons.schedule),
-                  if (selectedConfig.showDate)
-                    const _InfoChip(label: 'DATE', icon: Icons.calendar_today_outlined),
-                  if (selectedConfig.showSteps)
-                    const _InfoChip(label: 'STEPS', icon: Icons.directions_walk),
-                  if (selectedConfig.showBattery)
-                    const _InfoChip(label: 'BATTERY', icon: Icons.battery_5_bar),
+                    _InfoChip(
+                      label: selectedConfig.layout.toUpperCase(),
+                      icon: Icons.view_quilt_outlined,
+                    ),
+                    _InfoChip(
+                      label: selectedConfig.fontStyle.toUpperCase(),
+                      icon: Icons.text_fields,
+                    ),
+                    _InfoChip(
+                      label: selectedConfig.borderStyle.toUpperCase(),
+                      icon: Icons.border_style,
+                    ),
+                    _InfoChip(
+                      label: selectedConfig.clockType.toUpperCase(),
+                      icon: Icons.watch_later_outlined,
+                    ),
+                    _InfoChip(
+                      label: selectedConfig.timeFormat,
+                      icon: Icons.schedule,
+                    ),
+                    if (selectedConfig.showDate)
+                      const _InfoChip(
+                        label: 'DATE',
+                        icon: Icons.calendar_today_outlined,
+                      ),
+                    if (selectedConfig.showSteps)
+                      const _InfoChip(
+                        label: 'STEPS',
+                        icon: Icons.directions_walk,
+                      ),
+                    if (selectedConfig.showBattery)
+                      const _InfoChip(
+                        label: 'BATTERY',
+                        icon: Icons.battery_5_bar,
+                      ),
                   ],
-                )
-                    .animate()
-                    .fadeIn(delay: 200.ms, duration: 400.ms),
+                ).animate().fadeIn(delay: 200.ms, duration: 400.ms),
               ),
 
               const SizedBox(height: 20),
@@ -137,40 +149,43 @@ class ResultScreen extends ConsumerWidget {
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     itemCount: variants.length,
-                    separatorBuilder: (context, index) => const SizedBox(width: 12),
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(width: 12),
                     itemBuilder: (context, i) {
                       final isSelected = i == selectedIdx;
                       return GestureDetector(
-                        onTap: () =>
-                            ref.read(watchFaceProvider.notifier).selectVariant(i),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          padding: const EdgeInsets.all(3),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: isSelected
-                                  ? _kAccent
-                                  : Colors.white.withAlpha(30),
-                              width: isSelected ? 2.5 : 1.5,
+                            onTap: () => ref
+                                .read(watchFaceProvider.notifier)
+                                .selectVariant(i),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              padding: const EdgeInsets.all(3),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: isSelected
+                                      ? AppTheme.primaryColor
+                                      : Colors.white.withAlpha(30),
+                                  width: isSelected ? 2.5 : 1.5,
+                                ),
+                                boxShadow: isSelected
+                                    ? [
+                                        BoxShadow(
+                                          color: AppTheme.primaryColor
+                                              .withAlpha(100),
+                                          blurRadius: 12,
+                                          spreadRadius: 2,
+                                        ),
+                                      ]
+                                    : [],
+                              ),
+                              child: WatchPreviewWidget(
+                                config: variants[i],
+                                size: 68,
+                                showGlow: false,
+                              ),
                             ),
-                            boxShadow: isSelected
-                                ? [
-                                    BoxShadow(
-                                      color: _kAccent.withAlpha(100),
-                                      blurRadius: 12,
-                                      spreadRadius: 2,
-                                    )
-                                  ]
-                                : [],
-                          ),
-                          child: WatchPreviewWidget(
-                            config: variants[i],
-                            size: 68,
-                            showGlow: false,
-                          ),
-                        ),
-                      )
+                          )
                           .animate()
                           .fadeIn(delay: (100 * i).ms, duration: 300.ms)
                           .scale(
@@ -187,33 +202,39 @@ class ResultScreen extends ConsumerWidget {
               // ── Edit button ──
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: _EditButton(
-                  onTap: () {
-                    showModalBottomSheet(
-                      context: context,
-                      backgroundColor: Colors.transparent,
-                      isScrollControlled: true,
-                      builder: (context) => const _EditorSheet(),
-                    );
-                  },
-                )
-                    .animate()
-                    .fadeIn(delay: 250.ms, duration: 400.ms)
-                    .slideY(begin: 0.3, end: 0),
+                child:
+                    _EditButton(
+                          onTap: () {
+                            showModalBottomSheet(
+                              context: context,
+                              backgroundColor: Colors.transparent,
+                              isScrollControlled: true,
+                              builder: (context) => const _EditorSheet(),
+                            );
+                          },
+                        )
+                        .animate()
+                        .fadeIn(delay: 250.ms, duration: 400.ms)
+                        .slideY(begin: 0.3, end: 0),
               ),
               const SizedBox(height: 12),
 
               // ── Apply button ──
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
-                child: _ApplyButton(
-                  onTap: () =>
-                      ref.read(watchFaceProvider.notifier).applyToWatch(),
-                )
-                    .animate()
-                    .fadeIn(delay: 300.ms, duration: 400.ms)
-                    .slideY(begin: 0.3, end: 0)
-                    .shimmer(duration: 2000.ms, color: Colors.white.withAlpha(60)),
+                child:
+                    _ApplyButton(
+                          onTap: () => ref
+                              .read(watchFaceProvider.notifier)
+                              .applyToWatch(),
+                        )
+                        .animate()
+                        .fadeIn(delay: 300.ms, duration: 400.ms)
+                        .slideY(begin: 0.3, end: 0)
+                        .shimmer(
+                          duration: 2000.ms,
+                          color: Colors.white.withAlpha(60),
+                        ),
               ),
             ],
           ),
@@ -234,19 +255,19 @@ class _InfoChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: _kSurface,
+        color: AppTheme.surfaceColor,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.white.withAlpha(20)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 12, color: _kAccent),
+          Icon(icon, size: 12, color: AppTheme.primaryColor),
           const SizedBox(width: 4),
           Text(
             label,
             style: const TextStyle(
-              color: Colors.white60,
+              color: AppTheme.textSecondary,
               fontSize: 11,
               fontWeight: FontWeight.w500,
               letterSpacing: 0.5,
@@ -271,12 +292,10 @@ class _ApplyButton extends StatelessWidget {
         height: 54,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(27),
-          gradient: const LinearGradient(
-            colors: [Color(0xFF8B7FFF), _kAccent],
-          ),
+          gradient: AppTheme.primaryGradient,
           boxShadow: [
             BoxShadow(
-              color: _kAccent.withAlpha(100),
+              color: AppTheme.primaryColor.withAlpha(100),
               blurRadius: 20,
               offset: const Offset(0, 6),
             ),
@@ -317,17 +336,17 @@ class _EditButton extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(27),
           color: Colors.white.withAlpha(15),
-          border: Border.all(color: Colors.white.withAlpha(30)),
+          border: Border.all(color: AppTheme.primaryColor.withAlpha(100)),
         ),
         child: const Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.edit_note, color: Colors.white, size: 20),
+            Icon(Icons.edit_note, color: AppTheme.primaryColor, size: 20),
             SizedBox(width: 10),
             Text(
               'Customize Layout',
               style: TextStyle(
-                color: Colors.white,
+                color: AppTheme.textPrimary,
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 letterSpacing: 0.5,
@@ -351,7 +370,7 @@ class _EditorSheet extends ConsumerWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: _kBg.withAlpha(220),
+        color: AppTheme.bgDark.withAlpha(220),
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(28),
           topRight: Radius.circular(28),
@@ -386,7 +405,7 @@ class _EditorSheet extends ConsumerWidget {
                 const Text(
                   'Customize Details',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: AppTheme.textPrimary,
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
                   ),
@@ -394,10 +413,7 @@ class _EditorSheet extends ConsumerWidget {
                 const SizedBox(height: 8),
                 const Text(
                   'Fine-tune elements of the selected watch face dynamically.',
-                  style: TextStyle(
-                    color: Colors.white54,
-                    fontSize: 13,
-                  ),
+                  style: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
                 ),
                 const SizedBox(height: 24),
 
@@ -408,7 +424,9 @@ class _EditorSheet extends ConsumerWidget {
                   labels: ['Analog', 'Digital'],
                   selected: config.clockType,
                   onChanged: (val) {
-                    ref.read(watchFaceProvider.notifier).updateConfig(clockType: val);
+                    ref
+                        .read(watchFaceProvider.notifier)
+                        .updateConfig(clockType: val);
                   },
                 ),
                 const SizedBox(height: 20),
@@ -420,7 +438,9 @@ class _EditorSheet extends ConsumerWidget {
                   labels: ['12 Hour', '24 Hour'],
                   selected: config.timeFormat,
                   onChanged: (val) {
-                    ref.read(watchFaceProvider.notifier).updateConfig(timeFormat: val);
+                    ref
+                        .read(watchFaceProvider.notifier)
+                        .updateConfig(timeFormat: val);
                   },
                 ),
                 const SizedBox(height: 20),
@@ -429,7 +449,7 @@ class _EditorSheet extends ConsumerWidget {
                 const Text(
                   'COMPLICATIONS',
                   style: TextStyle(
-                    color: Colors.white38,
+                    color: AppTheme.textTertiary,
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 1.5,
@@ -441,7 +461,9 @@ class _EditorSheet extends ConsumerWidget {
                   icon: Icons.calendar_today_outlined,
                   value: config.showDate,
                   onChanged: (val) {
-                    ref.read(watchFaceProvider.notifier).updateConfig(showDate: val);
+                    ref
+                        .read(watchFaceProvider.notifier)
+                        .updateConfig(showDate: val);
                   },
                 ),
                 const SizedBox(height: 10),
@@ -450,7 +472,9 @@ class _EditorSheet extends ConsumerWidget {
                   icon: Icons.directions_walk,
                   value: config.showSteps,
                   onChanged: (val) {
-                    ref.read(watchFaceProvider.notifier).updateConfig(showSteps: val);
+                    ref
+                        .read(watchFaceProvider.notifier)
+                        .updateConfig(showSteps: val);
                   },
                 ),
                 const SizedBox(height: 10),
@@ -459,7 +483,9 @@ class _EditorSheet extends ConsumerWidget {
                   icon: Icons.battery_5_bar,
                   value: config.showBattery,
                   onChanged: (val) {
-                    ref.read(watchFaceProvider.notifier).updateConfig(showBattery: val);
+                    ref
+                        .read(watchFaceProvider.notifier)
+                        .updateConfig(showBattery: val);
                   },
                 ),
               ],
@@ -483,7 +509,7 @@ class _EditorSheet extends ConsumerWidget {
         Text(
           title,
           style: const TextStyle(
-            color: Colors.white38,
+            color: AppTheme.textTertiary,
             fontSize: 11,
             fontWeight: FontWeight.w600,
             letterSpacing: 1.5,
@@ -508,15 +534,21 @@ class _EditorSheet extends ConsumerWidget {
                     duration: const Duration(milliseconds: 200),
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: isSelected ? _kAccent : Colors.transparent,
+                      color: isSelected
+                          ? AppTheme.primaryColor
+                          : Colors.transparent,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
                       labels[idx],
                       style: TextStyle(
-                        color: isSelected ? Colors.white : Colors.white70,
+                        color: isSelected
+                            ? Colors.white
+                            : AppTheme.textSecondary,
                         fontSize: 13,
-                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                        fontWeight: isSelected
+                            ? FontWeight.w600
+                            : FontWeight.w500,
                       ),
                     ),
                   ),
@@ -554,13 +586,13 @@ class _ComplicationToggle extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(icon, color: _kAccent, size: 20),
+          Icon(icon, color: AppTheme.primaryColor, size: 20),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
               label,
               style: const TextStyle(
-                color: Colors.white,
+                color: AppTheme.textPrimary,
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),
@@ -568,8 +600,8 @@ class _ComplicationToggle extends StatelessWidget {
           ),
           Switch(
             value: value,
-            activeThumbColor: _kAccent,
-            activeTrackColor: _kAccent.withAlpha(80),
+            activeThumbColor: AppTheme.primaryColor,
+            activeTrackColor: AppTheme.primaryColor.withAlpha(80),
             inactiveThumbColor: Colors.white60,
             inactiveTrackColor: Colors.white.withAlpha(20),
             onChanged: onChanged,

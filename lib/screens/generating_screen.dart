@@ -167,7 +167,7 @@ class _GeneratingScreenState extends State<GeneratingScreen>
                       const Icon(Icons.psychology, size: 16, color: _kAccent),
                       const SizedBox(width: 8),
                       Text(
-                        'Powered by Gemini 1.5 Flash & Pollinations',
+                        'Powered by Gemini & Pollinations',
                         style: TextStyle(
                           color: Colors.white.withAlpha(200),
                           fontSize: 12,
